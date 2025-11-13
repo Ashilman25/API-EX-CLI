@@ -36,12 +36,30 @@ function getDb(filePath, defaultData) {
 
 
 
-
-
-
+//initialize storage dir and jsons
 function initStorage() {
-  throw new Error('Not implemented yet');
+  if (!fs.existsSync(STORAGE_DIR)) {
+    fs.mkdirSync(STORAGE_DIR, {recursive: true}); //check ~/.api-ex/ make if not exists
+  }
+
+  //data.json
+  const dataDb = getDb(DATA_FILE, {
+    requests: [],
+    environments: {}
+  });
+
+  //history.json
+  const historyDb = getDb(HISTORY_FILE, {
+    history: []
+  });
+
+  return {dataDb, historyDb};
 }
+
+
+
+
+
 
 function getRequests() {
   throw new Error('Not implemented yet');
