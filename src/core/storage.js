@@ -80,16 +80,35 @@ function getRequestByName(name) {
 
 
 
-
-
-
-
-
-
-
+//save or update requests
+//request = name, method, url, headers, data
 function saveRequest(request) {
-  throw new Error('Not implemented yet');
+  const db = getDb(DATA_FILE, {
+    requests: [],
+    environments: {}
+  });
+
+  //if request with same name exists
+  const requests = db.get('requests').value();
+  const existingIndex = requests.findIndex(r => r.name === request.name);
+
+  //update else make new
+  if (existingIndex !== -1) {
+    db.get('requests').nth(existingIndex).assign(request).write();
+
+  } else {
+    db.get('requests').push(request).write();
+  }
 }
+
+
+
+
+
+
+
+
+
 
 function getEnvironments() {
   throw new Error('Not implemented yet');
