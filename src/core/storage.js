@@ -3,11 +3,41 @@
 
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
 
-const STORAGE_DIR = path.join(os.homedir(), '.api-ex');
-const DATA_FILE = path.join(STORAGE_DIR, 'data.json');
-const HISTORY_FILE = path.join(STORAGE_DIR, 'history.json');
-const CONFIG_FILE = path.join(STORAGE_DIR, 'config.json');
+let STORAGE_DIR = process.env.API_EX_STORAGE_DIR || path.join(os.homedir(), '.api-ex');
+let DATA_FILE = path.join(STORAGE_DIR, 'data.json');
+let HISTORY_FILE = path.join(STORAGE_DIR, 'history.json');
+let CONFIG_FILE = path.join(STORAGE_DIR, 'config.json');
+
+
+//configure storage paths
+//for test mostly
+function setStorageDir(storageDir) {
+  STORAGE_DIR = storageDir;
+  DATA_FILE = path.join(STORAGE_DIR, 'data.json');
+  HISTORY_FILE = path.join(STORAGE_DIR, 'history.json');
+  CONFIG_FILE = path.join(STORAGE_DIR, 'config.json');
+}
+
+
+
+//get db for given file
+function getDb(filePath, defaultData) {
+  const adapter = new FileSync(filePath);
+  const db = low(adapter);
+
+  //if empty set default
+  db.defaults(defaultData).write();
+  return db;
+}
+
+
+
+
+
 
 function initStorage() {
   throw new Error('Not implemented yet');
