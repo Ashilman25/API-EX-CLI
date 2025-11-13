@@ -105,24 +105,53 @@ function saveRequest(request) {
 
 
 
-
-
-
-
-
 function getEnvironments() {
-  throw new Error('Not implemented yet');
+  const db = getDb(DATA_FILE, {
+    requests: [],
+    environments: {}
+  });
+
+  return db.get('environments').value();
 }
 
+
+//save or update env
 function saveEnvironment(name, variables) {
-  throw new Error('Not implemented yet');
+  const db = getDb(DATA_FILE, {
+    requests: [],
+    environments: {}
+  });
+
+  db.set(`environments.${name}`, variables).write();
 }
+
+
+//get storage dir path
+function getStorageDir() {
+  return STORAGE_DIR;
+}
+
+//data file path
+function getDataFile() {
+  return DATA_FILE;
+}
+
+//history file path
+function getHistoryFile() {
+  return HISTORY_FILE;
+}
+
+
 
 module.exports = {
   STORAGE_DIR,
   DATA_FILE,
   HISTORY_FILE,
   CONFIG_FILE,
+  getStorageDir,
+  getDataFile,
+  getHistoryFile,
+  setStorageDir,
   initStorage,
   getRequests,
   getRequestByName,
