@@ -44,8 +44,8 @@ function interpolate(templateString, env = {}) {
 
     return templateString.replace(PLACEHOLDER_REGEX, (match, key) => {
         if (Object.prototype.hasOwnProperty.call(env, key)) {
-            let value = env[key];
-            if (value === 'null') {
+            const value = env[key];
+            if (value == null) {
                 return '';
             } else {
                 return String(value);
@@ -59,3 +59,63 @@ function interpolate(templateString, env = {}) {
 
     }); 
 }
+
+
+//go through, url, headers, and body, 
+// and fill in all {{KEY}} with stuff from env
+function interpolateRequest(request = {}, env = {}) {
+    if (!request || typeof request !== 'object') {
+        return request;
+    }
+
+    const result = {...request};
+
+    if (typeof request.url === 'string') {
+        result.url = interpolate(result.url, env);
+    }
+
+    if (result.headers && typeof result.headers === 'object') {
+        let headers;
+
+        if (Array.isArray(result.headers)) {
+            headers = [...result.headers];
+        } else {
+            headers = {...result.headers};
+        }
+
+        if (Array.isArray(headers)) {
+            for (let i = 0; i < headers.length; i += 1) {
+                if (typeof headers[i] === 'string') {
+                    headers[i] = interpolate(headers[i], env);
+                }
+            }
+
+        } else {
+            Object.keys(headers).forEach((headerName) => {
+                const value = headers[headerName];
+
+                if (typeof value === 'string') {
+                    headers[headerName] = interpolate(value, env);
+                } else {
+                    headers[headerName] = value;
+                }
+            });
+        }
+
+        result.headers = headers;
+    }
+
+    if (typeof result.body === 'string') {
+        result.body = interpolate(result.body, env);
+    }
+
+    return result;
+
+}
+
+module.exports = {
+    getEnv,
+    interpolate,
+    interpolateRequest
+};
+
