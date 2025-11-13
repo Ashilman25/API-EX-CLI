@@ -58,16 +58,34 @@ function initStorage() {
 
 
 
-
-
-
+//saved requests
 function getRequests() {
-  throw new Error('Not implemented yet');
+  const db = getDb(DATA_FILE, {
+    requests: [],
+    environments: {}
+  });
+
+  return db.get('requests').value();
 }
 
+
+//requests by name, null if not
 function getRequestByName(name) {
-  throw new Error('Not implemented yet');
+  const requests = getRequests();
+  const request = requests.find(r => r.name === name);
+
+  return request || null;
 }
+
+
+
+
+
+
+
+
+
+
 
 function saveRequest(request) {
   throw new Error('Not implemented yet');
