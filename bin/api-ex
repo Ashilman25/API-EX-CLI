@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-/**
- * api-ex CLI Entrypoint
- * A fast, developer-friendly CLI for exploring and testing REST and GraphQL APIs
- */
+//api-ex CLI Entrypoint
 
 require('../src/index.js');
+
+
