@@ -42,8 +42,32 @@ function recordHistory(entry) {
 
 //to output record history when user wants to see
 function getHistory(options = {}) {
-  throw new Error('Not implemented yet');
+  const db = getHistoryDb();
+
+  //history array
+  let history = db.get('history').value();
+
+  //sort by timestamp
+  history = history.sort((a, b) => {
+    const dateA = new Date(a.timestamp);
+    const dateB = new Date(b.timestamp);
+
+    return dateB - dateA; //desc
+  });
+
+  //default limit of 10
+  let limit;
+  if (options.limit !== undefined) {
+    limit = options.limit;
+  } else {
+    limit = 10;
+  }
+
+  return history.slice(0, limit);
+
 }
+
+
 
 module.exports = {
   recordHistory,
