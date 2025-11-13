@@ -109,6 +109,12 @@ function interpolateRequest(request = {}, env = {}) {
         result.body = interpolate(result.body, env);
     }
 
+    // Also support 'data' field
+    //for axios and storage
+    if (typeof result.data === 'string') {
+        result.data = interpolate(result.data, env);
+    }
+
     return result;
 
 }
