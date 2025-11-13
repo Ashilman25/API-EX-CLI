@@ -42,20 +42,7 @@ node bin/api-ex --help
 - `api-ex gql` - Send GraphQL queries
 - `api-ex history` - View request history
 
-## Development Status
 
-**Current Phase:** Phase 0 - Setup & Skeleton ✅
-
-- [x] Initialize npm project
-- [x] Install dependencies (commander, axios, chalk, ora, prettyjson, cli-table3, lowdb, jest)
-- [x] Create folder structure
-- [x] Create CLI entrypoint
-- [x] Setup Jest configuration
-- [x] Create stub files for all commands and core modules
-
-**Next Phase:** Phase 1 - Core Engine & Storage
-
-See [apix-prd.md](apix-prd.md) for the complete Product Requirements Document.
 
 ## Tech Stack
 
@@ -69,4 +56,6 @@ See [apix-prd.md](apix-prd.md) for the complete Product Requirements Document.
 - **lowdb** - JSON storage
 - **jest** - Testing framework
 
+
+will do rest later
 
