@@ -1,6 +1,5 @@
-/**
- * Basic setup test to verify Jest is working
- */
+//Basic setup test to verify Jest is working
+
 
 describe('Project Setup', () => {
   test('Jest is configured and working', () => {
