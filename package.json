@@ -29,11 +29,11 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
-    "chalk": "^5.6.2",
+    "chalk": "^4.1.2",
     "cli-table3": "^0.6.5",
     "commander": "^14.0.2",
     "lowdb": "^1.0.0",
-    "ora": "^9.0.0",
+    "ora": "^5.4.1",
     "prettyjson": "^1.2.5"
   },
   "devDependencies": {
