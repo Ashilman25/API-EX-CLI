@@ -62,14 +62,24 @@ function printError(error, method, url) {
 
 //use cli-tabl3
 function printTable(headers, rows) {
-  throw new Error('Not implemented yet');
+  const table = new Table({head: headers});
+  table.push(...rows);
+  console.log(table.toString());
 }
 
 
 //if debug mode on
 function printDebug(label, data) {
-  throw new Error('Not implemented yet');
+  const debugEnabled = process.env.API_EX_DEBUG === '1' || process.env.DEBUG === 'true';
+
+  if (debugEnabled) {
+    console.log(chalk.cyan(`[DEBUG] ${label}:`));
+    console.log(data);
+  }
 }
+
+
+
 
 module.exports = {
   printSuccess,
