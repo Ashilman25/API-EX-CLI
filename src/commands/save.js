@@ -35,8 +35,30 @@ function register(program) {
         console.log(chalk.yellow(`Warning: Request '${name}' already exists. Overwriting...`));
       }
 
+      //store header as array
+      const request = {
+        name: name,
+        method: options.method.toUpperCase(),
+        url: options.url,
+        headers: options.header,
+        data: options.data || ''
+      };
 
-      
+      saveRequest(request);
+      console.log(chalk.green(`Saved request '${name}'`));
+
+      //summary
+      console.log(chalk.gray(`Method: ${request.method}`));
+      console.log(chalk.gray(`URL: ${request.url}`));
+
+      if (request.headers.length > 0) {
+        console.log(chalk.gray(`Headers: ${request.headers.length}`));
+      } 
+
+      if (request.data) {
+        console.log(chalk.gray(`  Body: ${request.data.substring(0, 50)}${request.data.length > 50 ? '...' : ''}`));
+      }
+
     });
 }
 
