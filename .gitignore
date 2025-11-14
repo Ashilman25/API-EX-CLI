@@ -41,10 +41,5 @@ logs/
 tmp/
 temp/
 
-apix-prd.md
-IMPLEMENTATION-PLAN.md
-TESTING.md
-
-test-printer.js
-test-request.js
-
+manual_tests
+helpful_docs
