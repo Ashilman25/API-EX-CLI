@@ -2,6 +2,10 @@
 
 const {program} = require('commander')
 const packageJson = require('../package.json')
+const storage = require('./core/storage')
+
+// Initialize storage on startup
+storage.initStorage();
 
 //metadata
 program
