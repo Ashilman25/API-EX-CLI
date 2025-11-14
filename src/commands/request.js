@@ -1,5 +1,14 @@
 //send ad-hoc HTTP requests
 
+const ora = require('ora');
+const chalk = require('chalk');
+
+const {sendRequest} = require('../core/http');
+const {getEnv, interpolateRequest} = require('../core/env');
+const {recordHistory} = require('../core/history');
+const {printSuccess, printError, printDebug} = require('../core/printer');
+
+
 
 
 function register(program) {
@@ -14,9 +23,77 @@ function register(program) {
     .option('--timeout <ms>', 'Request timeout in milliseconds', '30000')
     .action(async (options) => {
 
-      console.log('Request command not implemented yet');
-      console.log('Options:', options);
+      if (!options.url) {
+        console.log(chalk.red('Error: --url is required'));
+        console.log(chalk.gray('Usage: api-ex request --url <url> [options]'));
+        process.exit(1);
+      }
 
+      //parse headers from --header flags
+      const headers = {};
+      if (options.header && options.header.length > 0) {
+        options.header.forEach(h => {
+          const colonIndex = h.indexOf(':');
+
+          if (colonIndex === -1) {
+            console.log(chalk.yellow(`Warning: Invalid header format '${h}'. Expected 'Key: Value'`));
+            return;
+          }
+
+          const key = h.substring(0, colonIndex).trim();
+          const value = h.substring(colonIndex + 1).trim();
+          headers[key] = value;
+        });
+      }
+
+      let requestConfig = {
+        method: options.method.toUpperCase(),
+        url: options.url,
+        headers: headers,
+        data: options.data,
+        timeout: parseInt(options.timeout)
+      };
+
+      //if --env, load and interp
+      if (options.env) {
+        try {
+          const env = getEnv(options.env);
+
+          printDebug('Environment loaded', env);
+          printDebug('Request before interpolation', requestConfig);
+
+          requestConfig = interpolateRequest(requestConfig, env);
+          printDebug('Request after interpolation', requestConfig);
+
+        } catch (error) {
+          console.log(chalk.red(`Error: ${error.message}`));
+          process.exit(1);
+        }
+      }
+
+      const spinner = ora(`Sending ${requestConfig.method} ${requestConfig.url}`).start();
+
+      //send request
+      try {
+        printDebug('Final request config', requestConfig);
+        const response = await sendRequest(requestConfig);
+        spinner.stop();
+
+        printSuccess(response, requestConfig.method, requestConfig.url);
+
+        recordHistory({
+          method: requestConfig.method,
+          url: requestConfig.url,
+          status: response.status,
+          durationMs: response.durationMs,
+          env: options.env || null
+        });
+
+      } catch (error) {
+        spinner.stop();
+        printError(error, requestConfig.method, requestConfig.url);
+        process.exit(2);
+      }
     });
 }
 
