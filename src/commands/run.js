@@ -92,9 +92,34 @@ function register(program) {
 
         }
       }
+      
+      
+      
+      const spinner = ora(`Running '${name}': ${requestConfig.method} ${requestConfig.url}`).start();
+
+      try {
+        printDebug('Final request config', requestConfig);
+        const response = await sendRequest(requestConfig);
+        spinner.stop();
+
+        printSuccess(response, requestConfig.method, requestConfig.url);
+
+        recordHistory({
+          method: requestConfig.method,
+          url: requestConfig.url,
+          status: response.status,
+          durationMs: response.durationMs,
+          env: options.env || null,
+          savedRequestName: name
+        });
 
 
+      } catch (error) {
+        spinner.stop();
+        printError(error, requestConfig.method, requestConfig.url);
+        process.exit(2);
 
+      }
 
     });
 }
