@@ -1,14 +1,20 @@
 //format the CLI output
 //make look nice
 
-const chalk = require('chalk');
+const chalk = require('chalk'); //colors
 const prettyjson = require('prettyjson');
-const Table = require('cli-table3');
+const Table = require('cli-table3'); //auto table
 
 
 //status and pretty json
 function printSuccess(response, method, url) {
-  throw new Error('Not implemented yet');
+  console.log(chalk.green(`${method} ${url} ==> ${response.status} ${response.statusText} (${response.durationMs}ms)`));
+
+  if (response.data && typeof response.data === 'object') {
+    console.log(prettyjson.render(response.data));
+  } else {
+    console.log(response.data); //plain text
+  }
 }
 
 
