@@ -21,7 +21,41 @@ function printSuccess(response, method, url) {
 
 //error msg and details
 function printError(error, method, url) {
-  throw new Error('Not implemented yet');
+  console.log(chalk.red(`${method} ${url} ==> ERROR`));
+  console.log(chalk.red(`Error: ${error.message}`));
+
+  //if response data, show snippet
+  if (error.response) {
+    console.log(chalk.yellow(`Status: ${error.response.status} ${error.response.statusText}`));
+
+    if (error.response.data) {
+      let dataStr;
+      if (typeof error.response.data === 'string') {
+        dataStr = error.response.data;
+      } else {
+        dataStr = JSON.stringify(error.response.data);
+      }
+
+      const snippet = dataStr.substring(0, 200);
+      console.log(chalk.gray(`Response: ${snippet}${dataStr.length > 200 ? '...' : ''}`));
+
+    }
+  }
+
+  //help suggestions if applicable
+  if (error.code === 'ENOTFOUND') {
+    console.log(chalk.gray('\nTip: Check if the URL is correct and you have internet connectivity.'));
+
+  } else if (error.code === 'ETIMEDOUT' || error.code === 'ECONNABORTED') {
+    console.log(chalk.gray('\nTip: The request timed out. Try increasing the timeout with --timeout option.'));
+
+  } else if (error.response && error.response.status === 404) {
+    console.log(chalk.gray('\nTip: The endpoint was not found. Verify the URL path is correct.'));
+
+  } else if (error.response && error.response.status === 401) {
+    console.log(chalk.gray('\nTip: Authentication failed. Check your credentials or API key.'));
+
+  }
 }
 
 
