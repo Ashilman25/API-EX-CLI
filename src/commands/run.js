@@ -52,7 +52,49 @@ function register(program) {
         });
       }
 
-      
+
+      //header overrides if given
+      if (options.header && options.header.length > 0) {
+        options.header.forEach(h => {
+          const colonIndex = h.indexOf(':');
+
+          if (colonIndex === -1) {
+            console.log(chalk.yellow(`Warning: Invalid header format '${h}'. Expected 'Key: Value'`));
+            return;
+          }
+
+          const key = h.substring(0, colonIndex).trim();
+          const value = h.substring(colonIndex + 1).trim();
+          requestConfig.headers[key] = value;
+        });
+      }
+
+      //data override if provided
+      if (options.data) {
+        requestConfig.data = options.data;
+      }
+
+      //if --env, interp
+      if (options.env) {
+        try {
+          const env = getEnv(options.env);
+
+          printDebug('Environment loaded', env);
+          printDebug('Request before interpolation', requestConfig);
+
+          requestConfig = interpolateRequest(requestConfig, env);
+          printDebug('Request after interpolation', requestConfig);
+
+
+        } catch (error) {
+          console.log(chalk.red(`Error: ${error.message}`));
+          process.exit(1);
+
+        }
+      }
+
+
+
 
     });
 }
