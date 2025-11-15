@@ -320,4 +320,52 @@ describe('env command', () => {
       expect(envName).toBe('dev');
     });
   });
+
+  describe('env rm', () => {
+    test('should remove existing environment', async () => {
+      storage.removeEnvironment.mockImplementation(() => {});
+
+      await program.parseAsync(['node', 'test', 'env', 'rm', 'dev']);
+
+      expect(storage.removeEnvironment).toHaveBeenCalledWith('dev');
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("Environment 'dev' removed"));
+    });
+
+    test('should error when environment does not exist', async () => {
+      storage.removeEnvironment.mockImplementation(() => {
+        throw new Error("Environment 'nonexistent' does not exist");
+      });
+
+      await program.parseAsync(['node', 'test', 'env', 'rm', 'nonexistent']);
+
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('does not exist'));
+    });
+
+    test('should work with env remove alias', async () => {
+      storage.removeEnvironment.mockImplementation(() => {});
+
+      await program.parseAsync(['node', 'test', 'env', 'remove', 'prod']);
+
+      expect(storage.removeEnvironment).toHaveBeenCalledWith('prod');
+    });
+
+    test('should display success message after removal', async () => {
+      storage.removeEnvironment.mockImplementation(() => {});
+
+      await program.parseAsync(['node', 'test', 'env', 'rm', 'staging']);
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('✓'));
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('staging'));
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('removed'));
+    });
+
+    test('should handle environment names with special characters', async () => {
+      storage.removeEnvironment.mockImplementation(() => {});
+
+      await program.parseAsync(['node', 'test', 'env', 'rm', 'dev-us-east-1']);
+
+      expect(storage.removeEnvironment).toHaveBeenCalledWith('dev-us-east-1');
+    });
+  });
 });
