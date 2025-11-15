@@ -1,7 +1,7 @@
 ///manage envs
 
 const chalk = require('chalk');
-const {saveEnvironment, getEnvironments} = require('../core/storage');
+const {saveEnvironment, getEnvironments, removeEnvironment} = require('../core/storage');
 const {printTable} = require('../core/printer');
 
 
@@ -80,8 +80,16 @@ function register(program) {
         .description('Remove an environment')
         .action(async (name, options) => {
             
-            console.log(`Environment remove not implemented yet. Name: ${name}`);
+            try {
+                removeEnvironment(name);
+                console.log(chalk.green(`Environment '${name}' removed`));
 
+            } catch (error) {
+                console.log(chalk.red(`Error: ${error.message}`));
+                process.exit(1);
+                return;
+            }
+            
     });
 
 }
