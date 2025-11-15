@@ -1,7 +1,8 @@
 ///manage envs
 
 const chalk = require('chalk');
-const {saveEnvironment} = require('../core/storage');
+const {saveEnvironment, getEnvironments} = require('../core/storage');
+const {printTable} = require('../core/printer');
 
 
 function register(program) {
@@ -51,10 +52,26 @@ function register(program) {
         .alias('ls')
         .description('List all environments')
         .action(async (options) => {
-            
-            console.log('Environment list not implemented yet');
+            const environments = getEnvironments();
+
+            const envNames = Object.keys(environments);
+            if (envNames.length === 0) {
+                console.log(chalk.gray('No environments defined.'));
+                console.log(chalk.gray("Use 'api-ex env add' to create one."));
+                return;
+            }
+
+            const headers = ['Environment', 'Variables'];
+            const rows = envNames.map(name => [
+                chalk.cyan(name),
+                Object.keys(environments[name]).join(', ')
+            ]);
+
+            printTable(headers, rows);
 
     });
+
+    
 
     //env rm 
     env
