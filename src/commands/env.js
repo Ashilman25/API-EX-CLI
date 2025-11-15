@@ -1,5 +1,7 @@
 ///manage envs
 
+const chalk = require('chalk');
+const {saveEnvironment} = require('../core/storage');
 
 
 function register(program) {
@@ -12,9 +14,34 @@ function register(program) {
         .description('Add or update an environment')
         .action(async (name, variables, options) => {
 
-            console.log(`Environment add not implemented yet. Name: ${name}`);
-            console.log('Variables:', variables);
+            //pars vars
+            const envVars = {};
+            variables.forEach(v => {
+                const [key, value] = v.split('=');
 
+                if (key && value) {
+                    envVars[key] = value;
+                } else {
+                    console.log(chalk.yellow(`Warning: Skipping invalid variable format: ${v}`));
+                }
+            });
+
+            const varCount = Object.keys(envVars).length;
+            if (varCount === 0) {
+                console.log(chalk.red('Error: No valid variables provided.'));
+                console.log(chalk.gray('Format: api-ex env add <name> KEY=value KEY2=value2'));
+                process.exit(1);
+                return;
+            }
+
+            saveEnvironment(name, envVars);
+            console.log(chalk.green(`Environment '${name}' updated with ${varCount} variable(s)`));
+
+            //show what was saved
+            Object.keys(envVars).forEach(key => {
+                console.log(chalk.gray(`  ${key}=${envVars[key]}`));
+            });
+            
     });
 
 
