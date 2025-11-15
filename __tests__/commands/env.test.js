@@ -6,6 +6,7 @@ const { Command } = require('commander');
 const chalk = require('chalk');
 const envCommand = require('../../src/commands/env');
 const storage = require('../../src/core/storage');
+const printer = require('../../src/core/printer');
 
 // Mock chalk to avoid color codes in test output
 jest.mock('chalk', () => ({
@@ -18,6 +19,9 @@ jest.mock('chalk', () => ({
 
 // Mock storage module
 jest.mock('../../src/core/storage');
+
+// Mock printer module
+jest.mock('../../src/core/printer');
 
 describe('env command', () => {
   let program;
@@ -204,6 +208,116 @@ describe('env command', () => {
       expect(storage.saveEnvironment).toHaveBeenCalledWith('test', {
         VALID: 'value'
       });
+    });
+  });
+
+  describe('env list', () => {
+    test('should show message when no environments defined', async () => {
+      storage.getEnvironments.mockReturnValue({});
+
+      await program.parseAsync(['node', 'test', 'env', 'list']);
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('No environments defined'));
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("api-ex env add"));
+      expect(printer.printTable).not.toHaveBeenCalled();
+    });
+
+    test('should list single environment', async () => {
+      storage.getEnvironments.mockReturnValue({
+        dev: {
+          BASE_URL: 'http://localhost:3000',
+          AUTH_TOKEN: 'dev-token'
+        }
+      });
+
+      await program.parseAsync(['node', 'test', 'env', 'list']);
+
+      expect(printer.printTable).toHaveBeenCalledWith(
+        ['Environment', 'Variables'],
+        expect.arrayContaining([
+          expect.arrayContaining(['dev', expect.stringContaining('BASE_URL')])
+        ])
+      );
+    });
+
+    test('should list multiple environments', async () => {
+      storage.getEnvironments.mockReturnValue({
+        dev: { BASE_URL: 'http://localhost:3000' },
+        prod: { BASE_URL: 'https://api.example.com', API_KEY: 'secret' },
+        staging: { BASE_URL: 'https://staging.example.com' }
+      });
+
+      await program.parseAsync(['node', 'test', 'env', 'list']);
+
+      expect(printer.printTable).toHaveBeenCalledWith(
+        ['Environment', 'Variables'],
+        expect.any(Array)
+      );
+
+      const callArgs = printer.printTable.mock.calls[0];
+      const rows = callArgs[1];
+      expect(rows).toHaveLength(3);
+    });
+
+    test('should display variable names as comma-separated list', async () => {
+      storage.getEnvironments.mockReturnValue({
+        prod: {
+          BASE_URL: 'https://api.example.com',
+          AUTH_TOKEN: 'token123',
+          API_KEY: 'key456'
+        }
+      });
+
+      await program.parseAsync(['node', 'test', 'env', 'list']);
+
+      const callArgs = printer.printTable.mock.calls[0];
+      const rows = callArgs[1];
+      const variablesColumn = rows[0][1];
+
+      expect(variablesColumn).toContain('BASE_URL');
+      expect(variablesColumn).toContain('AUTH_TOKEN');
+      expect(variablesColumn).toContain('API_KEY');
+      expect(variablesColumn).toContain(', ');
+    });
+
+    test('should work with env ls alias', async () => {
+      storage.getEnvironments.mockReturnValue({
+        dev: { KEY: 'value' }
+      });
+
+      await program.parseAsync(['node', 'test', 'env', 'ls']);
+
+      expect(printer.printTable).toHaveBeenCalled();
+    });
+
+    test('should handle environment with single variable', async () => {
+      storage.getEnvironments.mockReturnValue({
+        simple: { SINGLE_VAR: 'value' }
+      });
+
+      await program.parseAsync(['node', 'test', 'env', 'list']);
+
+      const callArgs = printer.printTable.mock.calls[0];
+      const rows = callArgs[1];
+      const variablesColumn = rows[0][1];
+
+      expect(variablesColumn).toBe('SINGLE_VAR');
+      expect(variablesColumn).not.toContain(',');
+    });
+
+    test('should use cyan color for environment names', async () => {
+      storage.getEnvironments.mockReturnValue({
+        dev: { KEY: 'value' }
+      });
+
+      await program.parseAsync(['node', 'test', 'env', 'list']);
+
+      const callArgs = printer.printTable.mock.calls[0];
+      const rows = callArgs[1];
+      const envName = rows[0][0];
+
+      // chalk.cyan is mocked to return the text as-is
+      expect(envName).toBe('dev');
     });
   });
 });
