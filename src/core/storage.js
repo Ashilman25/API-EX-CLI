@@ -126,6 +126,21 @@ function saveEnvironment(name, variables) {
 }
 
 
+//remove env
+function removeEnvironment(name) {
+  const db = getDb(DATA_FILE, {
+    requests: [],
+    environments: {}
+  });
+
+  if (!db.get('environments').value()[name]) {
+    throw new Error(`Environment '${name}' does not exist`);
+  }
+
+  db.unset(`environments.${name}`).write();
+}
+
+
 //get storage dir path
 function getStorageDir() {
   return STORAGE_DIR;
@@ -157,5 +172,6 @@ module.exports = {
   getRequestByName,
   saveRequest,
   getEnvironments,
-  saveEnvironment
+  saveEnvironment,
+  removeEnvironment
 };
