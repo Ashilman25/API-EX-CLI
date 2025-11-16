@@ -7,6 +7,7 @@ const {sendRequest} = require('../core/http');
 const {getEnv, interpolateRequest} = require('../core/env');
 const {recordHistory} = require('../core/history');
 const {printSuccess, printError, printDebug} = require('../core/printer');
+const {validateUrl, validateHttpMethod, validateTimeout, validateJsonData, validateEnvironmentName} = require('../core/validation');
 
 
 
@@ -29,6 +30,23 @@ function register(program) {
         process.exit(1);
       }
 
+      // Validate inputs
+      let validatedMethod, validatedTimeout;
+      try {
+        validateUrl(options.url);
+        validatedMethod = validateHttpMethod(options.method);
+        validatedTimeout = validateTimeout(options.timeout);
+        if (options.data) {
+          validateJsonData(options.data);
+        }
+        if (options.env) {
+          validateEnvironmentName(options.env);
+        }
+      } catch (error) {
+        console.log(chalk.red(`Error: ${error.message}`));
+        process.exit(1);
+      }
+
       //parse headers from --header flags
       const headers = {};
       if (options.header && options.header.length > 0) {
@@ -47,11 +65,11 @@ function register(program) {
       }
 
       let requestConfig = {
-        method: options.method.toUpperCase(),
+        method: validatedMethod,
         url: options.url,
         headers: headers,
         data: options.data,
-        timeout: parseInt(options.timeout)
+        timeout: validatedTimeout
       };
 
       //if --env, load and interp
