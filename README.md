@@ -16,10 +16,10 @@ A fast, developer-friendly CLI for exploring and testing REST and GraphQL APIs f
 
 ```bash
 # Install globally
-npm install -g api-ex
+npm install -g @ashilman/api-ex
 
 # Or use with npx (no installation required)
-npx api-ex
+npx @ashilman/api-ex
 
 # Verify installation
 api-ex --version
