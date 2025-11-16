@@ -13,7 +13,7 @@ function register(program) {
     .option('--status <status>', 'Filter by status code')
     .action(async (options) => {
       const limit = parseInt(options.limit) || 10;
-      let history = GetHistory({limit});
+      let history = getHistory({limit});
 
       //filter by method
       if (options.method) {
@@ -38,10 +38,33 @@ function register(program) {
         return date.toLocaleString();
       };
 
-      
+      const headers = ['Time', 'Method', 'Status', 'Duration', 'URL'];
+      const rows = history.map(entry => {
 
+        let status;
+        if (entry.status >= 400) {
+          status = chalk.red(entry.status);
+        } else {
+          status = chalk.green(entry.status);
+        }
 
+        let urlDisplay = entry.url;
+        if (entry.url.length > 50) {
+          urlDisplay = entry.url.substring(0, 50) + '...';
+        }
 
+        return [
+          chalk.gray(formatDate(entry.timestamp)),
+          chalk.yellow(entry.method),
+          status,
+          chalk.gray(`${entry.durationMs}ms`),
+          urlDisplay
+        ];
+
+      });
+
+      printTable(headers, rows);
+      console.log(chalk.gray(`\nShowing ${history.length} most recent request(s)`));
       
     });
 }
