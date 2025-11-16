@@ -18,7 +18,7 @@ function register(program) {
     .action(async (name, options) => {
 
       if (!options.url) {
-        console.log(chalk.red('Error: --url is required'));
+        console.log(chalk.red('Error: --url is required.'));
         console.log(chalk.gray('Usage: api-ex save <name> --url <url> [options]'));
         process.exit(1);
       }
