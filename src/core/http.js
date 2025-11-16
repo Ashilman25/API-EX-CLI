@@ -1,20 +1,21 @@
 const axios = require('axios');
 const {printDebug} = require('./printer');
+const {NetworkError, ValidationError} = require('./errors');
 
 //http request sending with axios
 //request = method, url, headers, data, timeout
 //promsise obj = normalized response with status, statusText, headers, data, duration
 async function sendRequest(config) {
   if (!config) {
-    throw new Error('Request configuration is required');
+    throw new ValidationError('Request configuration is required');
   }
 
   if (!config.method) {
-    throw new Error('Request method is required');
+    throw new ValidationError('Request method is required');
   }
 
   if (!config.url) {
-    throw new Error('Request URL is required');
+    throw new ValidationError('Request URL is required');
   }
 
   const timeout = config.timeout || 30000;
@@ -65,18 +66,18 @@ async function sendRequest(config) {
 
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
       //timeout error
-      throw new Error(`Request timeout after ${timeout}ms: ${config.method} ${config.url}`);
+      throw new NetworkError(`Request timeout after ${timeout}ms: ${config.method} ${config.url}`);
 
-    } else if (error.response) { 
+    } else if (error.response) {
       //error status code, shouldnt happen tho cuz i accept all status codes
-      throw new Error(`HTTP ${error.response.status}: ${error.response.statusText}`);
+      throw new NetworkError(`HTTP ${error.response.status}: ${error.response.statusText}`);
 
     } else if (error.request) {
       //network error, request made but no response
-      throw new Error(`Network error: Unable to reach ${config.url}. ${error.message}`);
+      throw new NetworkError(`Unable to reach ${config.url}. ${error.message}`);
 
     } else {
-      throw new Error(`Request failed: ${error.message}`);
+      throw new NetworkError(`Request failed: ${error.message}`);
 
     }
   }
