@@ -180,6 +180,10 @@ describe('Validation Module', () => {
     it('should throw for invalid characters', () => {
       expect(() => validation.validateEnvironmentName('dev/prod')).toThrow('invalid characters');
     });
+
+    it('should throw for whitespace-only string', () => {
+      expect(() => validation.validateEnvironmentName('   ')).toThrow('cannot be empty');
+    });
   });
 
   describe('validateHttpMethod()', () => {
@@ -267,6 +271,18 @@ describe('Validation Module', () => {
 
     it('should include the invalid URL in error message', () => {
       expect(() => validation.validateUrl('bad-url')).toThrow('bad-url');
+    });
+
+    it('should throw for whitespace-only string', () => {
+      expect(() => validation.validateUrl('   ')).toThrow('cannot be empty');
+    });
+
+    it('should validate URL without placeholders when disabled', () => {
+      expect(validation.validateUrl('https://api.example.com', false)).toBe('https://api.example.com');
+    });
+
+    it('should throw for invalid URL with placeholders disabled', () => {
+      expect(() => validation.validateUrl('{{BASE_URL}}/api', false)).toThrow('Invalid URL format');
     });
   });
 

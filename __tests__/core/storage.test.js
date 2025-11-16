@@ -321,6 +321,65 @@ describe('Storage Module', () => {
     });
   });
 
+  describe('removeEnvironment()', () => {
+    beforeEach(() => {
+      storage.initStorage();
+    });
+
+    it('should remove an existing environment', () => {
+      storage.saveEnvironment('dev', { BASE_URL: 'http://localhost:3000' });
+      storage.saveEnvironment('prod', { BASE_URL: 'https://api.example.com' });
+
+      storage.removeEnvironment('dev');
+
+      const environments = storage.getEnvironments();
+      expect(environments.dev).toBeUndefined();
+      expect(environments.prod).toBeDefined();
+    });
+
+    it('should throw error when environment does not exist', () => {
+      expect(() => storage.removeEnvironment('non-existent')).toThrow("Environment 'non-existent' does not exist");
+    });
+
+    it('should not affect other environments', () => {
+      storage.saveEnvironment('dev', { BASE_URL: 'http://localhost:3000' });
+      storage.saveEnvironment('staging', { BASE_URL: 'http://staging.example.com' });
+      storage.saveEnvironment('prod', { BASE_URL: 'https://api.example.com' });
+
+      storage.removeEnvironment('staging');
+
+      const environments = storage.getEnvironments();
+      expect(Object.keys(environments).length).toBe(2);
+      expect(environments.dev).toBeDefined();
+      expect(environments.prod).toBeDefined();
+      expect(environments.staging).toBeUndefined();
+    });
+
+    it('should persist removal to file', () => {
+      storage.saveEnvironment('temp', { VAR: 'value' });
+      storage.removeEnvironment('temp');
+
+      // Read directly from file to verify persistence
+      const fileData = JSON.parse(fs.readFileSync(TEST_DATA_FILE, 'utf-8'));
+      expect(fileData.environments.temp).toBeUndefined();
+    });
+
+    it('should not affect saved requests', () => {
+      storage.saveRequest({
+        name: 'test-request',
+        method: 'GET',
+        url: 'http://example.com'
+      });
+      storage.saveEnvironment('dev', { BASE_URL: 'http://localhost:3000' });
+
+      storage.removeEnvironment('dev');
+
+      const requests = storage.getRequests();
+      expect(requests.length).toBe(1);
+      expect(requests[0].name).toBe('test-request');
+    });
+  });
+
   describe('Integration: requests and environments together', () => {
     beforeEach(() => {
       storage.initStorage();
