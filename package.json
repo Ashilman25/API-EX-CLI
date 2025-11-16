@@ -1,5 +1,5 @@
 {
-  "name": "api-ex",
+  "name": "@ashilman/api-ex",
   "version": "1.0.0",
   "description": "A fast, developer-friendly CLI for exploring and testing REST and GraphQL APIs from the terminal",
   "main": "src/index.js",
