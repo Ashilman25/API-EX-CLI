@@ -144,3 +144,33 @@ function validateUrl(url, allowPlaceholders = true) {
 
   return trimmedUrl;
 }
+
+
+// Validate JSON data option
+function validateJsonData(data) {
+  if (!data || typeof data !== 'string') {
+    return data;
+  }
+
+  // If it looks like JSON (starts with { or [), validate it
+  const trimmed = data.trim();
+  if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+      (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+    if (!isValidJson(trimmed)) {
+      throw new ValidationError('Invalid JSON format in request body. Check your syntax.');
+    }
+  }
+
+  return data;
+}
+
+module.exports = {
+  isValidUrl,
+  isValidJson,
+  validateRequestName,
+  validateEnvironmentName,
+  validateHttpMethod,
+  validateTimeout,
+  validateUrl,
+  validateJsonData
+};
