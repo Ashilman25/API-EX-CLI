@@ -87,3 +87,60 @@ function validateEnvironmentName(name) {
 
   return trimmedName;
 }
+
+
+
+// Validate HTTP method
+function validateHttpMethod(method) {
+  const validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+  const upperMethod = method.toUpperCase();
+
+  if (!validMethods.includes(upperMethod)) {
+    throw new ValidationError(`Invalid HTTP method '${method}'. Valid methods: ${validMethods.join(', ')}.`);
+  }
+
+  return upperMethod;
+}
+
+// Validate timeout value
+function validateTimeout(timeout) {
+  const num = parseInt(timeout);
+
+  if (isNaN(num) || num <= 0) {
+    throw new ValidationError('Timeout must be a positive number in milliseconds.');
+  }
+
+  if (num > 600000) {
+    throw new ValidationError('Timeout cannot exceed 600000ms (10 minutes).');
+  }
+
+  return num;
+}
+
+// Validate URL and provide helpful message
+function validateUrl(url, allowPlaceholders = true) {
+  if (!url || typeof url !== 'string') {
+    throw new ValidationError('URL is required.');
+  }
+
+  const trimmedUrl = url.trim();
+
+  if (!trimmedUrl) {
+    throw new ValidationError('URL cannot be empty.');
+  }
+
+  // Check for placeholders
+  const hasPlaceholders = /\{\{.*?\}\}/.test(trimmedUrl);
+
+  if (allowPlaceholders && hasPlaceholders) {
+    // Just check basic structure with placeholders
+    const testUrl = trimmedUrl.replace(/\{\{.*?\}\}/g, 'placeholder');
+    if (!isValidUrl(testUrl)) {
+      throw new ValidationError(`Invalid URL format: ${url}`);
+    }
+  } else if (!isValidUrl(trimmedUrl)) {
+    throw new ValidationError(`Invalid URL format: ${url}`);
+  }
+
+  return trimmedUrl;
+}
