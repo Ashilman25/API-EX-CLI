@@ -8,7 +8,7 @@ const chalk = require('chalk');
 const {sendRequest} = require('../core/http');
 const {getEnv, interpolateRequest} = require('../core/env');
 const {recordHistory} = require('../core/history');
-const {printSuccess, printError} = require('../core/printer');
+const {printSuccess, printError, printDebug} = require('../core/printer');
 
 function register(program) {
   program
@@ -85,10 +85,14 @@ function register(program) {
         })
       };
 
+      printDebug('Request before interpolation', requestConfig);
+
       //if --env, interp
       if (options.env) {
         const env = getEnv(options.env);
+        printDebug('Environment loaded', env);
         requestConfig = interpolateRequest(requestConfig, env);
+        printDebug('Request after interpolation', requestConfig);
       }
 
       //send request
