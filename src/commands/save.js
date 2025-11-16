@@ -4,6 +4,7 @@
 
 const chalk = require('chalk');
 const {saveRequest, getRequestByName} = require('../core/storage');
+const {validateRequestName, validateUrl, validateHttpMethod, validateJsonData} = require('../core/validation');
 
 
 //register the save command
@@ -23,22 +24,30 @@ function register(program) {
         process.exit(1);
       }
 
-      //names with spaces
-      if (/\s/.test(name)) {
-        console.log(chalk.yellow('Warning: Request name contains spaces. This may cause issues when running the request.'));
-        console.log(chalk.gray('Consider using dashes or underscores instead: my-request'));
+      // Validate inputs
+      let validatedName, validatedMethod;
+      try {
+        validatedName = validateRequestName(name);
+        validateUrl(options.url);
+        validatedMethod = validateHttpMethod(options.method);
+        if (options.data) {
+          validateJsonData(options.data);
+        }
+      } catch (error) {
+        console.log(chalk.red(`Error: ${error.message}`));
+        process.exit(1);
       }
 
       //request already exists
-      const existing = getRequestByName(name);
+      const existing = getRequestByName(validatedName);
       if (existing) {
-        console.log(chalk.yellow(`Warning: Request '${name}' already exists. Overwriting...`));
+        console.log(chalk.yellow(`Warning: Request '${validatedName}' already exists. Overwriting...`));
       }
 
       //store header as array
       const request = {
-        name: name,
-        method: options.method.toUpperCase(),
+        name: validatedName,
+        method: validatedMethod,
         url: options.url,
         headers: options.header,
         data: options.data || ''
