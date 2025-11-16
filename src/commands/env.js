@@ -3,6 +3,7 @@
 const chalk = require('chalk');
 const {saveEnvironment, getEnvironments, removeEnvironment} = require('../core/storage');
 const {printTable} = require('../core/printer');
+const {validateEnvironmentName} = require('../core/validation');
 
 
 function register(program) {
@@ -14,6 +15,15 @@ function register(program) {
         .command('add <name> [variables...]')
         .description('Add or update an environment')
         .action(async (name, variables, options) => {
+
+            // Validate environment name
+            let validatedName;
+            try {
+                validatedName = validateEnvironmentName(name);
+            } catch (error) {
+                console.log(chalk.red(`Error: ${error.message}`));
+                process.exit(1);
+            }
 
             //pars vars
             const envVars = {};
@@ -35,8 +45,8 @@ function register(program) {
                 return;
             }
 
-            saveEnvironment(name, envVars);
-            console.log(chalk.green(`Environment '${name}' updated with ${varCount} variable(s)`));
+            saveEnvironment(validatedName, envVars);
+            console.log(chalk.green(`Environment '${validatedName}' updated with ${varCount} variable(s)`));
 
             //show what was saved
             Object.keys(envVars).forEach(key => {
@@ -73,16 +83,25 @@ function register(program) {
 
     
 
-    //env rm 
+    //env rm
     env
         .command('rm <name>')
         .alias('remove')
         .description('Remove an environment')
         .action(async (name, options) => {
-            
+
+            // Validate environment name
+            let validatedName;
             try {
-                removeEnvironment(name);
-                console.log(chalk.green(`Environment '${name}' removed.`));
+                validatedName = validateEnvironmentName(name);
+            } catch (error) {
+                console.log(chalk.red(`Error: ${error.message}`));
+                process.exit(1);
+            }
+
+            try {
+                removeEnvironment(validatedName);
+                console.log(chalk.green(`Environment '${validatedName}' removed.`));
 
             } catch (error) {
                 console.log(chalk.red(`Error: ${error.message}`));
@@ -90,7 +109,7 @@ function register(program) {
                 process.exit(1);
                 return;
             }
-            
+
     });
 
 }
