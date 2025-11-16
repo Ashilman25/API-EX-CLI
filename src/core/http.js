@@ -1,4 +1,5 @@
 const axios = require('axios');
+const {printDebug} = require('./printer');
 
 //http request sending with axios
 //request = method, url, headers, data, timeout
@@ -27,16 +28,28 @@ async function sendRequest(config) {
 
   //axios request
   try {
-    const response = await axios({
+    const axiosConfig = {
       method: config.method,
       url: config.url,
       headers: headers,
       data: config.data,
       timeout: timeout,
       validateStatus: () => true //all status codes good
+    };
+
+    printDebug('Axios config', {
+      method: axiosConfig.method,
+      url: axiosConfig.url,
+      headers: axiosConfig.headers,
+      data: axiosConfig.data,
+      timeout: axiosConfig.timeout
     });
 
+    const response = await axios(axiosConfig);
+
     const durationMs = Date.now() - startTime;
+
+    printDebug('Response headers', response.headers);
 
     //normalized response
     return {
