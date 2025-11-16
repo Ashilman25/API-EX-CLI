@@ -24,7 +24,9 @@ function register(program) {
 
       //check for either --query or --file
       if (!options.query && !options.file) {
-        console.log(chalk.red('Error: Either --query or --file must be provided'));
+        console.log(chalk.red('Error: Either --query or --file must be provided.'));
+        console.log(chalk.gray('Usage: api-ex gql --endpoint <url> --query <query>'));
+        console.log(chalk.gray('   or: api-ex gql --endpoint <url> --file <path>'));
         process.exit(1);
       }
 
@@ -40,7 +42,8 @@ function register(program) {
           query = fs.readFileSync(filePath, 'utf-8');
 
         } catch (error) {
-          console.log(chalk.red(`Error reading file: ${error.message}`));
+          console.log(chalk.red(`Error: Could not read file '${options.file}'.`));
+          console.log(chalk.gray(error.message));
           process.exit(1);
 
         }
@@ -57,7 +60,8 @@ function register(program) {
           variables = JSON.parse(options.variables);
 
         } catch (error) {
-          console.log(chalk.red('Error: Invalid JSON in --variables'));
+          console.log(chalk.red('Error: Invalid JSON in --variables.'));
+          console.log(chalk.gray('Expected format: --variables \'{"key": "value"}\''));
           console.log(chalk.gray(error.message));
           process.exit(1);
 
