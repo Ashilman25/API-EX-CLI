@@ -3,6 +3,25 @@
 const {program} = require('commander')
 const packageJson = require('../package.json')
 const storage = require('./core/storage')
+const {setDebugMode, isDebugMode} = require('./core/debug')
+const chalk = require('chalk')
+
+// Global error handlers for uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error(chalk.red('Unexpected error:'), error.message);
+  if (isDebugMode()) {
+    console.error(error.stack);
+  }
+  process.exit(2);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(chalk.red('Unhandled rejection:'), reason);
+  if (isDebugMode()) {
+    console.error('Promise:', promise);
+  }
+  process.exit(2);
+});
 
 // Initialize storage on startup
 storage.initStorage();
@@ -19,6 +38,13 @@ program
   .option('--debug', 'Enable debug mode with verbose output')
   .option('--no-color', 'Disable colored output');
 
+//set debug mode before any command runs
+program.hook('preAction', (thisCommand, actionCommand) => {
+  const opts = thisCommand.opts();
+  if (opts.debug) {
+    setDebugMode(true);
+  }
+});
 
 //basic commands
 require('./commands/request')(program);

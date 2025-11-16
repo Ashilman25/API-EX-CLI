@@ -8,7 +8,8 @@ const chalk = require('chalk');
 const {sendRequest} = require('../core/http');
 const {getEnv, interpolateRequest} = require('../core/env');
 const {recordHistory} = require('../core/history');
-const {printSuccess, printError} = require('../core/printer');
+const {printSuccess, printError, printDebug} = require('../core/printer');
+const {validateUrl, validateEnvironmentName} = require('../core/validation');
 
 function register(program) {
   program
@@ -24,7 +25,20 @@ function register(program) {
 
       //check for either --query or --file
       if (!options.query && !options.file) {
-        console.log(chalk.red('Error: Either --query or --file must be provided'));
+        console.log(chalk.red('Error: Either --query or --file must be provided.'));
+        console.log(chalk.gray('Usage: api-ex gql --endpoint <url> --query <query>'));
+        console.log(chalk.gray('   or: api-ex gql --endpoint <url> --file <path>'));
+        process.exit(1);
+      }
+
+      // Validate inputs
+      try {
+        validateUrl(options.endpoint);
+        if (options.env) {
+          validateEnvironmentName(options.env);
+        }
+      } catch (error) {
+        console.log(chalk.red(`Error: ${error.message}`));
         process.exit(1);
       }
 
@@ -40,7 +54,8 @@ function register(program) {
           query = fs.readFileSync(filePath, 'utf-8');
 
         } catch (error) {
-          console.log(chalk.red(`Error reading file: ${error.message}`));
+          console.log(chalk.red(`Error: Could not read file '${options.file}'.`));
+          console.log(chalk.gray(error.message));
           process.exit(1);
 
         }
@@ -57,7 +72,8 @@ function register(program) {
           variables = JSON.parse(options.variables);
 
         } catch (error) {
-          console.log(chalk.red('Error: Invalid JSON in --variables'));
+          console.log(chalk.red('Error: Invalid JSON in --variables.'));
+          console.log(chalk.gray('Expected format: --variables \'{"key": "value"}\''));
           console.log(chalk.gray(error.message));
           process.exit(1);
 
@@ -85,10 +101,14 @@ function register(program) {
         })
       };
 
+      printDebug('Request before interpolation', requestConfig);
+
       //if --env, interp
       if (options.env) {
         const env = getEnv(options.env);
+        printDebug('Environment loaded', env);
         requestConfig = interpolateRequest(requestConfig, env);
+        printDebug('Request after interpolation', requestConfig);
       }
 
       //send request

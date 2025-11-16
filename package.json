@@ -1,11 +1,17 @@
 {
   "name": "api-ex",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A fast, developer-friendly CLI for exploring and testing REST and GraphQL APIs from the terminal",
   "main": "src/index.js",
   "bin": {
     "api-ex": "./bin/api-ex"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
@@ -27,6 +33,14 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ashilman25/API-EX-CLI"
+  },
+  "bugs": {
+    "url": "https://github.com/Ashilman25/API-EX-CLI/issues"
+  },
+  "homepage": "https://github.com/Ashilman25/API-EX-CLI#readme",
   "dependencies": {
     "axios": "^1.13.2",
     "chalk": "^4.1.2",

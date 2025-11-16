@@ -1,4 +1,5 @@
 const {getEnvironments} = require('./storage')
+const {ConfigurationError} = require('./errors');
 const PLACEHOLDER_REGEX = /{{\s*([^{}\s]+)\s*}}/g;
 
 
@@ -13,7 +14,7 @@ function getEnv(name) {
     }
 
     if (!envName) {
-        throw new Error('Environment name is required.');
+        throw new ConfigurationError('Environment name is required.');
     }
 
     const environments = getEnvironments() || {};
@@ -29,7 +30,7 @@ function getEnv(name) {
             suffix = `No environments have been defined yet.`;
         }
 
-        throw new Error(`Unknown environment "${envName}". ${suffix}`);
+        throw new ConfigurationError(`Unknown environment "${envName}". ${suffix}`);
     }
 
     return env;

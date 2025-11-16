@@ -10,6 +10,10 @@ jest.mock('../../src/core/http');
 jest.mock('../../src/core/env');
 jest.mock('../../src/core/history');
 jest.mock('../../src/core/printer');
+jest.mock('../../src/core/validation', () => ({
+  validateUrl: jest.fn((url) => url),
+  validateEnvironmentName: jest.fn((name) => name)
+}));
 jest.mock('fs');
 jest.mock('ora', () => {
   return jest.fn(() => ({
@@ -520,7 +524,7 @@ describe('GraphQL Command', () => {
         fail('Should have thrown an error');
       } catch (error) {
         expect(error.message).toContain('Process exited with code 1');
-        expect(consoleOutput.some(line => line.includes('Error reading file'))).toBe(true);
+        expect(consoleOutput.some(line => line.includes('Could not read file'))).toBe(true);
       }
     });
 

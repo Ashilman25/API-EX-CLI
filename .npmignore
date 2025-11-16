@@ -1,0 +1,34 @@
+# Test files
+__tests__/
+coverage/
+*.test.js
+jest.config.js
+
+# Documentation (not needed in package)
+docs/
+examples/
+
+# Development files
+.github/
+.eslintrc.js
+.prettierrc
+.editorconfig
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

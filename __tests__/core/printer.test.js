@@ -2,6 +2,7 @@ const printer = require('../../src/core/printer');
 const chalk = require('chalk');
 const prettyjson = require('prettyjson');
 const Table = require('cli-table3');
+const debug = require('../../src/core/debug');
 
 // Mock console.log to capture output
 let consoleOutput = [];
@@ -283,12 +284,13 @@ describe('Printer Module', () => {
 
   describe('printDebug()', () => {
     let originalEnv;
-    let originalDebug;
 
     beforeEach(() => {
       // Save original environment
       originalEnv = process.env.API_EX_DEBUG;
-      originalDebug = process.env.DEBUG;
+      // Reset debug mode
+      debug.setDebugMode(false);
+      delete process.env.API_EX_DEBUG;
     });
 
     afterEach(() => {
@@ -298,17 +300,10 @@ describe('Printer Module', () => {
       } else {
         process.env.API_EX_DEBUG = originalEnv;
       }
-      if (originalDebug === undefined) {
-        delete process.env.DEBUG;
-      } else {
-        process.env.DEBUG = originalDebug;
-      }
+      debug.setDebugMode(false);
     });
 
     it('should not print when debug mode is disabled', () => {
-      delete process.env.API_EX_DEBUG;
-      delete process.env.DEBUG;
-
       printer.printDebug('Test Label', { key: 'value' });
 
       expect(console.log).not.toHaveBeenCalled();
@@ -324,8 +319,8 @@ describe('Printer Module', () => {
       expect(consoleOutput[0]).toContain('Test Label');
     });
 
-    it('should print when DEBUG=true', () => {
-      process.env.DEBUG = 'true';
+    it('should print when debug mode is set programmatically', () => {
+      debug.setDebugMode(true);
 
       printer.printDebug('Request Config', { method: 'GET', url: 'http://example.com' });
 
@@ -334,8 +329,8 @@ describe('Printer Module', () => {
       expect(consoleOutput[0]).toContain('Request Config');
     });
 
-    it('should print debug label and data separately', () => {
-      process.env.API_EX_DEBUG = '1';
+    it('should print debug label and JSON-formatted data separately', () => {
+      debug.setDebugMode(true);
 
       const debugData = {
         method: 'POST',
@@ -348,11 +343,22 @@ describe('Printer Module', () => {
       expect(console.log).toHaveBeenCalledTimes(2);
       expect(consoleOutput[0]).toContain('[DEBUG]');
       expect(consoleOutput[0]).toContain('Sending Request');
+      // Second call should be JSON formatted
+      expect(consoleOutput[1]).toContain('method');
+      expect(consoleOutput[1]).toContain('POST');
+    });
+
+    it('should print non-object data as-is', () => {
+      debug.setDebugMode(true);
+
+      printer.printDebug('Simple Value', 'just a string');
+
+      expect(console.log).toHaveBeenCalledTimes(2);
+      expect(consoleOutput[1]).toBe('just a string');
     });
 
     it('should not print when API_EX_DEBUG is set to other values', () => {
       process.env.API_EX_DEBUG = '0';
-      delete process.env.DEBUG;
 
       printer.printDebug('Test', { data: 'test' });
 

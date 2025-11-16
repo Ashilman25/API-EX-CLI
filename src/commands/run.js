@@ -24,8 +24,8 @@ function register(program) {
 
       const savedRequest = getRequestByName(name);
       if (!savedRequest) {
-        console.log(chalk.red(`Error: No saved request found with name '${name}'`));
-        console.log(chalk.gray(`Use 'api-ex ls' to see all saved requests`));
+        console.log(chalk.red(`Error: No saved request found with name '${name}'.`));
+        console.log(chalk.gray('Use "api-ex ls" to see all saved requests.'));
         process.exit(1);
       }
 
@@ -88,13 +88,14 @@ function register(program) {
 
         } catch (error) {
           console.log(chalk.red(`Error: ${error.message}`));
+          console.log(chalk.gray('Use "api-ex env list" to see available environments.'));
           process.exit(1);
 
         }
       }
-      
-      
-      
+
+
+
       const spinner = ora(`Running '${name}': ${requestConfig.method} ${requestConfig.url}`).start();
 
       try {
