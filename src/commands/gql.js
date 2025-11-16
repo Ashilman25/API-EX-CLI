@@ -74,13 +74,56 @@ function register(program) {
       });
 
 
+      //GQL request
+      let requestConfig = {
+        method: 'POST',
+        url: options.endpoint,
+        headers: headers,
+        data: JSON.stringify({
+          query: query,
+          variables: variables
+        })
+      };
 
+      //if --env, interp
+      if (options.env) {
+        const env = getEnv(options.env);
+        requestConfig = interpolateRequest(requestConfig, env);
+      }
 
+      //send request
+      const spinner = ora(`Sending GraphQL query to ${requestConfig.url}`).start();
 
+      try {
+        const response = await sendRequest(requestConfig);
+        spinner.stop();
 
+        //check for gql errors
+        if (response.data && response.data.errors) {
+          console.log(chalk.red('GraphQL Errors:'));
 
+          response.data.errors.forEach((err, index) => {
+            console.log(chalk.red(`  ${index + 1}. ${err.message || JSON.stringify(err)}`));
+          });
+        }
 
+        printSuccess(response, 'POST', requestConfig.url);
 
+        recordHistory({
+          method: 'POST',
+          url: requestConfig.url,
+          status: response.status,
+          durationMs: response.durationMs,
+          env: options.env || null
+        });
+        
+
+      } catch (error) {
+        spinner.stop();
+        printError(error, 'POST', requestConfig.url);
+        process.exit(2);
+
+      }
 
     });
 }
