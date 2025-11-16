@@ -1,5 +1,9 @@
 //request history
 
+const chalk = require('chalk');
+const {getHistory} = require('../core/history');
+const {printTable} = require('../core/printer');
+
 function register(program) {
   program
     .command('history')
@@ -8,9 +12,59 @@ function register(program) {
     .option('--method <method>', 'Filter by HTTP method')
     .option('--status <status>', 'Filter by status code')
     .action(async (options) => {
+      const limit = parseInt(options.limit) || 10;
+      let history = getHistory({limit});
 
-      console.log('History command not implemented yet');
-      console.log('Options:', options);
+      //filter by method
+      if (options.method) {
+        const methodFilter = options.method.toUpperCase();
+        history = history.filter(entry => entry.method === methodFilter);
+      }
+
+      //filter by status
+      if (options.status) {
+        const statusFilter = parseInt(options.status);
+        history = history.filter(entry => entry.status === statusFilter);
+      }
+
+      if (history.length === 0) {
+        console.log(chalk.gray('No history yet.'));
+        console.log(chalk.gray("Run 'api-ex request' or api-ex run' to create history entries."));
+        return;
+      }
+
+      const formatDate = (isoString) => {
+        const date = new Date(isoString);
+        return date.toLocaleString();
+      };
+
+      const headers = ['Time', 'Method', 'Status', 'Duration', 'URL'];
+      const rows = history.map(entry => {
+
+        let status;
+        if (entry.status >= 400) {
+          status = chalk.red(entry.status);
+        } else {
+          status = chalk.green(entry.status);
+        }
+
+        let urlDisplay = entry.url;
+        if (entry.url.length > 50) {
+          urlDisplay = entry.url.substring(0, 50) + '...';
+        }
+
+        return [
+          chalk.gray(formatDate(entry.timestamp)),
+          chalk.yellow(entry.method),
+          status,
+          chalk.gray(`${entry.durationMs}ms`),
+          urlDisplay
+        ];
+
+      });
+
+      printTable(headers, rows);
+      console.log(chalk.gray(`\nShowing ${history.length} most recent request(s)`));
       
     });
 }
