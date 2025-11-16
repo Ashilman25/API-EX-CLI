@@ -24,7 +24,7 @@ function register(program) {
     .action(async (options) => {
 
       if (!options.url) {
-        console.log(chalk.red('Error: --url is required'));
+        console.log(chalk.red('Error: --url is required.'));
         console.log(chalk.gray('Usage: api-ex request --url <url> [options]'));
         process.exit(1);
       }
@@ -67,6 +67,7 @@ function register(program) {
 
         } catch (error) {
           console.log(chalk.red(`Error: ${error.message}`));
+          console.log(chalk.gray('Use "api-ex env list" to see available environments.'));
           process.exit(1);
         }
       }
