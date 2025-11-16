@@ -9,6 +9,7 @@ const {sendRequest} = require('../core/http');
 const {getEnv, interpolateRequest} = require('../core/env');
 const {recordHistory} = require('../core/history');
 const {printSuccess, printError, printDebug} = require('../core/printer');
+const {validateUrl, validateEnvironmentName} = require('../core/validation');
 
 function register(program) {
   program
@@ -27,6 +28,17 @@ function register(program) {
         console.log(chalk.red('Error: Either --query or --file must be provided.'));
         console.log(chalk.gray('Usage: api-ex gql --endpoint <url> --query <query>'));
         console.log(chalk.gray('   or: api-ex gql --endpoint <url> --file <path>'));
+        process.exit(1);
+      }
+
+      // Validate inputs
+      try {
+        validateUrl(options.endpoint);
+        if (options.env) {
+          validateEnvironmentName(options.env);
+        }
+      } catch (error) {
+        console.log(chalk.red(`Error: ${error.message}`));
         process.exit(1);
       }
 
