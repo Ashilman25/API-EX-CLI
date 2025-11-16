@@ -5,6 +5,8 @@ const chalk = require('chalk'); //colors
 const prettyjson = require('prettyjson');
 const Table = require('cli-table3'); //auto table
 
+const {isDebugMode} = require('./debug');
+
 
 //status and pretty json
 function printSuccess(response, method, url) {
@@ -70,11 +72,13 @@ function printTable(headers, rows) {
 
 //if debug mode on
 function printDebug(label, data) {
-  const debugEnabled = process.env.API_EX_DEBUG === '1' || process.env.DEBUG === 'true';
-
-  if (debugEnabled) {
+  if (isDebugMode()) {
     console.log(chalk.cyan(`[DEBUG] ${label}:`));
-    console.log(data);
+    if (typeof data === 'object') {
+      console.log(JSON.stringify(data, null, 2));
+    } else {
+      console.log(data);
+    }
   }
 }
 
