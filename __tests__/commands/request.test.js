@@ -6,8 +6,17 @@ const printer = require('../../src/core/printer');
 // Mock all core modules
 jest.mock('../../src/core/http');
 jest.mock('../../src/core/env');
-jest.mock('../../src/core/history');
-jest.mock('../../src/core/printer');
+jest.mock('../../src/core/history', () => ({
+  recordHistory: jest.fn(),
+  getHistory: jest.fn()
+}));
+jest.mock('../../src/core/debug');
+jest.mock('../../src/core/printer', () => ({
+  printSuccess: jest.fn(),
+  printError: jest.fn(),
+  printDebug: jest.fn(),
+  printTable: jest.fn()
+}));
 jest.mock('ora', () => {
   return jest.fn(() => ({
     start: jest.fn().mockReturnThis(),
@@ -49,10 +58,6 @@ beforeEach(() => {
   process.exit = jest.fn((code) => {
     throw new Error(`Process exited with code ${code}`);
   });
-
-  printer.printSuccess = jest.fn();
-  printer.printError = jest.fn();
-  printer.printDebug = jest.fn();
 });
 
 afterEach(() => {
@@ -71,7 +76,6 @@ describe('Request Command', () => {
       };
 
       http.sendRequest.mockResolvedValue(mockResponse);
-      history.recordHistory = jest.fn();
 
       const program = new Command();
       program.exitOverride();
@@ -115,7 +119,6 @@ describe('Request Command', () => {
       };
 
       http.sendRequest.mockResolvedValue(mockResponse);
-      history.recordHistory = jest.fn();
 
       const program = new Command();
       program.exitOverride();
@@ -156,7 +159,6 @@ describe('Request Command', () => {
       };
 
       http.sendRequest.mockResolvedValue(mockResponse);
-      history.recordHistory = jest.fn();
 
       const program = new Command();
       program.exitOverride();
@@ -218,7 +220,6 @@ describe('Request Command', () => {
       env.getEnv.mockReturnValue(mockEnv);
       env.interpolateRequest.mockReturnValue(mockInterpolatedRequest);
       http.sendRequest.mockResolvedValue(mockResponse);
-      history.recordHistory = jest.fn();
 
       const program = new Command();
       program.exitOverride();
@@ -326,7 +327,6 @@ describe('Request Command', () => {
       };
 
       http.sendRequest.mockResolvedValue(mockResponse);
-      history.recordHistory = jest.fn();
 
       const program = new Command();
       program.exitOverride();
@@ -360,7 +360,6 @@ describe('Request Command', () => {
       };
 
       http.sendRequest.mockResolvedValue(mockResponse);
-      history.recordHistory = jest.fn();
 
       const program = new Command();
       program.exitOverride();
@@ -384,7 +383,6 @@ describe('Request Command', () => {
       };
 
       http.sendRequest.mockResolvedValue(mockResponse);
-      history.recordHistory = jest.fn();
 
       const program = new Command();
       program.exitOverride();
@@ -421,8 +419,7 @@ describe('Request Command', () => {
         };
 
         http.sendRequest.mockResolvedValue(mockResponse);
-        history.recordHistory = jest.fn();
-
+  
         const program = new Command();
         program.exitOverride();
         requestModule(program);
