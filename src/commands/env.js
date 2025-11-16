@@ -82,10 +82,11 @@ function register(program) {
             
             try {
                 removeEnvironment(name);
-                console.log(chalk.green(`Environment '${name}' removed`));
+                console.log(chalk.green(`Environment '${name}' removed.`));
 
             } catch (error) {
                 console.log(chalk.red(`Error: ${error.message}`));
+                console.log(chalk.gray('Use "api-ex env list" to see available environments.'));
                 process.exit(1);
                 return;
             }
