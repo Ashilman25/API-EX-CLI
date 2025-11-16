@@ -17,6 +17,13 @@ jest.mock('../../src/core/printer', () => ({
   printDebug: jest.fn(),
   printTable: jest.fn()
 }));
+jest.mock('../../src/core/validation', () => ({
+  validateUrl: jest.fn((url) => url),
+  validateHttpMethod: jest.fn((method) => method.toUpperCase()),
+  validateTimeout: jest.fn((timeout) => parseInt(timeout)),
+  validateJsonData: jest.fn((data) => data),
+  validateEnvironmentName: jest.fn((name) => name)
+}));
 jest.mock('ora', () => {
   return jest.fn(() => ({
     start: jest.fn().mockReturnThis(),

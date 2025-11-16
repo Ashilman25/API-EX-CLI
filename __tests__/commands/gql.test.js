@@ -10,6 +10,10 @@ jest.mock('../../src/core/http');
 jest.mock('../../src/core/env');
 jest.mock('../../src/core/history');
 jest.mock('../../src/core/printer');
+jest.mock('../../src/core/validation', () => ({
+  validateUrl: jest.fn((url) => url),
+  validateEnvironmentName: jest.fn((name) => name)
+}));
 jest.mock('fs');
 jest.mock('ora', () => {
   return jest.fn(() => ({
