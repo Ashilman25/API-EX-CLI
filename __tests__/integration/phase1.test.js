@@ -503,7 +503,7 @@ describe('Phase 1 Integration Tests', () => {
       axios.mockRejectedValue(networkError);
 
       // Should throw network error
-      await expect(http.sendRequest(request)).rejects.toThrow(/Network error/);
+      await expect(http.sendRequest(request)).rejects.toThrow(/Unable to reach/);
     });
 
     it('should handle timeout and not crash', async () => {

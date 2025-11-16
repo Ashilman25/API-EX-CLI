@@ -520,7 +520,7 @@ describe('GraphQL Command', () => {
         fail('Should have thrown an error');
       } catch (error) {
         expect(error.message).toContain('Process exited with code 1');
-        expect(consoleOutput.some(line => line.includes('Error reading file'))).toBe(true);
+        expect(consoleOutput.some(line => line.includes('Could not read file'))).toBe(true);
       }
     });
 

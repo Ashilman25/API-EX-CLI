@@ -293,7 +293,7 @@ describe('HTTP Module', () => {
           method: 'GET',
           url: 'http://unreachable.example.com'
         })
-      ).rejects.toThrow('Network error: Unable to reach http://unreachable.example.com');
+      ).rejects.toThrow('Unable to reach http://unreachable.example.com');
     });
 
     it('should handle timeout error', async () => {
@@ -335,7 +335,7 @@ describe('HTTP Module', () => {
           method: 'GET',
           url: 'http://localhost:3000'
         })
-      ).rejects.toThrow('Network error: Unable to reach http://localhost:3000');
+      ).rejects.toThrow('Unable to reach http://localhost:3000');
     });
 
     it('should handle DNS resolution error', async () => {
@@ -349,7 +349,7 @@ describe('HTTP Module', () => {
           method: 'GET',
           url: 'http://invalid.domain'
         })
-      ).rejects.toThrow('Network error: Unable to reach http://invalid.domain');
+      ).rejects.toThrow('Unable to reach http://invalid.domain');
     });
 
     it('should handle general request errors', async () => {
